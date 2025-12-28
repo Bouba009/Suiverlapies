@@ -1,483 +1,356 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>منصة تتبع قطع الغيار | Plateforme de Suivi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistics Pro | منصة التتبع الشاملة</title>
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts (Cairo) -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
+    <!-- خطوط وأيقونات -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            --bg-gradient: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.5);
-            --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --glass: rgba(255, 255, 255, 0.95);
+            --border: #e2e8f0;
+            --focus-ring: rgba(37, 99, 235, 0.2);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
 
         body {
-            font-family: 'Cairo', sans-serif;
-            margin: 0;
+            font-family: 'Tajawal', sans-serif;
+            background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.9)), 
+                              url('https://images.unsplash.com/photo-1494412574643-35d324688133?q=80&w=2075');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: #334155;
             min-height: 100vh;
-            background: linear-gradient(-45deg, #f1f5f9, #e2e8f0, #cbd5e1, #f8fafc);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: #1e293b;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* شاشة الدخول */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #020617; display: flex; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .login-box {
+            background: white; padding: 40px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .login-input {
+            width: 100%; padding: 15px; font-size: 20px; text-align: center; border: 2px solid var(--border);
+            border-radius: 12px; margin: 20px 0; letter-spacing: 5px; font-weight: bold;
+        }
+        .btn-login {
+            background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px;
+            font-size: 16px; cursor: pointer; width: 100%; font-weight: bold;
         }
 
-        /* --- Login Screen --- */
-        #login-section {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') no-repeat center center/cover;
-            position: relative;
-            padding: 20px;
+        /* الحاوية الرئيسية */
+        #app-container { display: none; max-width: 98%; margin: 0 auto; padding: 20px; }
+
+        header {
+            background: var(--glass); padding: 20px 30px; border-radius: 16px; margin-bottom: 25px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
+        .brand h1 { color: var(--primary); font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+
+        /* الإحصائيات (5 بطاقات) */
+        .stats-container {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px;
+        }
+        .stat-card {
+            background: var(--glass); padding: 20px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-bottom: 4px solid transparent; transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
         
-        #login-section::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(8px);
+        .stat-card.total { border-color: var(--primary); }
+        .stat-card.port { border-color: #3b82f6; }
+        .stat-card.customs { border-color: #ef4444; }
+        .stat-card.transport { border-color: #f59e0b; }
+        .stat-card.final { border-color: #10b981; }
+
+        .stat-details h3 { font-size: 2rem; font-weight: 800; color: var(--primary); line-height: 1; margin-bottom: 5px; }
+        .stat-details p { font-size: 0.85rem; color: #64748b; font-weight: 600; }
+        .stat-icon { font-size: 2rem; opacity: 0.7; }
+
+        /* النموذج */
+        .form-card {
+            background: var(--glass); padding: 30px; border-radius: 16px; margin-bottom: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        .form-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;
         }
 
-        .login-card {
-            position: relative;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 3rem;
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.4);
-            animation: slideUp 0.6s ease-out;
+        /* تنسيق الحقول */
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 700; color: #1e293b; font-size: 0.9rem; }
+        .input-wrapper {
+            display: flex; align-items: stretch; border: 2px solid #cbd5e1; border-radius: 10px;
+            background: white; transition: all 0.3s; overflow: hidden;
         }
+        .input-icon-box {
+            background: #f1f5f9; width: 50px; display: flex; align-items: center; justify-content: center;
+            border-left: 1px solid #cbd5e1; color: #64748b; font-size: 1.1rem;
+        }
+        .input-wrapper input, .input-wrapper select {
+            width: 100%; border: none; padding: 12px; font-family: inherit; font-size: 1rem; color: #334155;
+        }
+        .input-wrapper:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--focus-ring); }
+        .input-wrapper:focus-within .input-icon-box { background: var(--accent); color: white; border-color: var(--accent); }
 
-        .login-icon-box {
-            width: 80px;
-            height: 80px;
-            background: var(--primary-gradient);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            color: white;
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        .btn-submit {
+            grid-column: 1 / -1; background: linear-gradient(135deg, #1e293b, #0f172a); color: white;
+            padding: 16px; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 800;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px;
+            transition: 0.3s;
         }
+        .btn-submit:hover { opacity: 0.9; transform: scale(0.99); }
 
-        /* --- Mobile Optimizations for Login --- */
-        @media (max-width: 576px) {
-            .login-card {
-                padding: 2rem 1.5rem;
-            }
-            .login-icon-box {
-                width: 60px;
-                height: 60px;
-            }
-            .login-card h3 { font-size: 1.5rem; }
-        }
-
-        /* --- Main App --- */
-        #app-section {
-            display: none;
-            padding-bottom: 60px;
-        }
-
-        .navbar-custom {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            padding: 0.8rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .glass-card {
-            background: var(--glass-bg);
-            border: var(--glass-border);
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
-            margin-bottom: 2rem;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
+        /* الجدول الشامل */
+        .table-card { background: var(--glass); padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid #e2e8f0; }
         
-        .card-header-modern {
-            background: white;
-            padding: 1.5rem;
-            border-bottom: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th { background: #f8fafc; padding: 18px 15px; text-align: right; color: #1e293b; font-weight: 800; font-size: 0.95rem; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.95rem; vertical-align: middle; }
+        tr:hover td { background: #f8fafc; }
 
-        /* Floating Forms */
-        .form-floating > .form-control, 
-        .form-floating > .form-select {
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            background-color: #f8fafc;
-            height: 58px;
+        /* تنسيقات خاصة للخلايا */
+        .cell-main { font-weight: bold; color: var(--accent); }
+        .cell-sub { font-size: 0.85rem; color: #64748b; }
+        .flag-icon { font-size: 1.4rem; margin-left: 5px; vertical-align: middle; }
+
+        /* بادج الحالة */
+        .status-badge {
+            padding: 6px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s;
         }
+        .status-badge:hover { filter: brightness(0.95); }
         
-        .form-floating > .form-control:focus,
-        .form-floating > .form-select:focus {
-            background-color: #fff;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-            border-color: #3b82f6;
-        }
+        .st-port { background: #dbeafe; color: #1e40af; }
+        .st-customs { background: #fee2e2; color: #991b1b; }
+        .st-transport { background: #fef3c7; color: #92400e; }
+        .st-final { background: #dcfce7; color: #166534; }
 
-        .form-floating > label {
-            right: 0; 
-            left: auto;
-            padding-right: 1.5rem;
-            color: #64748b;
-            font-size: 0.9rem;
-        }
-
-        .btn-modern {
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            padding: 12px 35px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            letter-spacing: 0.5px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
-        }
-
-        .btn-modern:active {
-            transform: scale(0.98);
-        }
-
-        /* Table Styling Responsive */
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
-        }
-
-        .modern-table {
-            min-width: 1000px; /* Forces scroll on small screens */
-        }
-
-        .modern-table thead th {
-            background-color: #f1f5f9;
-            color: #475569;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            padding: 1rem;
-            border: none;
-            white-space: nowrap;
-        }
-        
-        .modern-table tbody td {
-            padding: 1rem;
-            border-bottom: 1px solid #f1f5f9;
-            vertical-align: middle;
-            font-size: 0.95rem;
-            white-space: nowrap;
-        }
-
-        .status-select {
-            border-radius: 50px;
-            padding: 6px 30px 6px 15px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            border: none;
-            cursor: pointer;
-            text-align: center;
-            appearance: none;
-            background-position: left 0.75rem center;
-        }
-
-        .status-port { background-color: #dbeafe; color: #1e40af; }
-        .status-customs { background-color: #ffedd5; color: #9a3412; }
-        .status-transport { background-color: #f3e8ff; color: #6b21a8; }
-        .status-final { background-color: #dcfce7; color: #166534; }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- Mobile Specific Adjustments --- */
         @media (max-width: 768px) {
-            .navbar-custom .container {
-                flex-direction: row; /* Keep row but maybe wrap */
-            }
-            
-            .navbar-brand-text h5 { font-size: 1rem; }
-            .navbar-brand-text small { font-size: 0.7rem; }
-            
-            .card-header-modern {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .card-header-modern .badge {
-                margin-top: 5px;
-            }
-
-            .card-body {
-                padding: 1.5rem !important;
-            }
-
-            /* Make inputs 50% width on mobile instead of 100% stack */
-            .mobile-half {
-                width: 50%;
-            }
-
-            .btn-modern {
-                width: 100%; /* Full width button on mobile */
-                padding: 15px;
-            }
+            .form-grid { grid-template-columns: 1fr; }
+            .stats-container { grid-template-columns: 1fr 1fr; }
+            header { flex-direction: column; text-align: center; gap: 15px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ================= Login Section ================= -->
-    <section id="login-section">
-        <div class="login-card">
-            <div class="login-icon-box">
-                <i class="fas fa-cubes fa-2x"></i>
-            </div>
-            <h3 class="fw-bold mb-2 text-dark">منصة التتبع الذكية</h3>
-            <p class="text-muted mb-4">Suivi des Pièces et Équipements</p>
-            
-            <div class="form-floating mb-3 text-end">
-                <input type="password" class="form-control text-center fs-4 fw-bold" id="access-code" placeholder="Code" inputmode="numeric">
-                <label for="access-code" class="w-100 text-center">أدخل رمز المرور / Code d'accès</label>
-            </div>
-
-            <button id="login-btn" class="btn btn-modern w-100 mt-2">
-                تسجيل الدخول <i class="fas fa-arrow-left ms-2"></i>
-            </button>
-            <p id="login-error" class="text-danger mt-3 fw-bold small" style="display: none;">
-                <i class="fas fa-exclamation-circle"></i> الرمز غير صحيح! / Code incorrect!
-            </p>
+    <!-- تسجيل الدخول -->
+    <div id="login-screen">
+        <div class="login-box">
+            <i class="fa-solid fa-ship fa-4x" style="color: var(--primary); margin-bottom: 20px;"></i>
+            <h2>بوابة المتابعة اللوجستية</h2>
+            <p style="color: #64748b; margin-bottom: 10px;">يرجى إدخال رمز التعريف</p>
+            <input type="password" id="pinCode" class="login-input" placeholder="****" maxlength="4">
+            <button class="btn-login" onclick="checkLogin()">تسجيل الدخول</button>
         </div>
-    </section>
+    </div>
 
-    <!-- ================= Main App Section ================= -->
-    <section id="app-section">
-        
-        <!-- Navbar -->
-        <nav class="navbar-custom">
-            <div class="container d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center navbar-brand-text">
-                    <div class="bg-primary text-white rounded-3 p-2 me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                        <i class="fas fa-satellite-dish"></i>
-                    </div>
-                    <div>
-                        <h5 class="mb-0 fw-bold text-dark">منصة التتبع</h5>
-                        <small class="text-muted d-block" style="line-height: 1;">Plateforme de Suivi</small>
+    <div id="app-container">
+        <header>
+            <div class="brand">
+                <h1><i class="fa-solid fa-boxes-stacked"></i> منصة تتبع قطع الغيار والمعدات</h1>
+                <p style="color: #475569; font-weight: 500;">Plateforme de Suivi des Pièces et Équipements</p>
+            </div>
+            <div style="text-align: left;">
+                <div style="font-weight: bold; font-size: 1.1rem;" id="currentDateDisplay"></div>
+            </div>
+        </header>
+
+        <!-- الإحصائيات (5 بطاقات) -->
+        <div class="stats-container">
+            <div class="stat-card total">
+                <div class="stat-details">
+                    <h3 id="count-total">0</h3>
+                    <p>إجمالي الشحنات</p>
+                </div>
+                <div class="stat-icon" style="color: var(--primary);"><i class="fa-solid fa-layer-group"></i></div>
+            </div>
+            <div class="stat-card port">
+                <div class="stat-details">
+                    <h3 id="count-port">0</h3>
+                    <p>داخل الميناء</p>
+                </div>
+                <div class="stat-icon" style="color: #3b82f6;"><i class="fa-solid fa-anchor"></i></div>
+            </div>
+            <div class="stat-card customs">
+                <div class="stat-details">
+                    <h3 id="count-customs">0</h3>
+                    <p>المراقبة الجمركية</p>
+                </div>
+                <div class="stat-icon" style="color: #ef4444;"><i class="fa-solid fa-scale-balanced"></i></div>
+            </div>
+            <div class="stat-card transport">
+                <div class="stat-details">
+                    <h3 id="count-transport">0</h3>
+                    <p>قيد التوصيل</p>
+                </div>
+                <div class="stat-icon" style="color: #f59e0b;"><i class="fa-solid fa-truck-fast"></i></div>
+            </div>
+            <div class="stat-card final">
+                <div class="stat-details">
+                    <h3 id="count-final">0</h3>
+                    <p>وصلت للوجهة</p>
+                </div>
+                <div class="stat-icon" style="color: #10b981;"><i class="fa-solid fa-check-circle"></i></div>
+            </div>
+        </div>
+
+        <!-- النموذج -->
+        <div class="form-card">
+            <h3 style="margin-bottom: 20px; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                <i class="fa-solid fa-pen-to-square"></i> إدخال بيانات جديدة
+            </h3>
+            
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>تاريخ الإدخال</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon-box"><i class="fa-regular fa-calendar"></i></div>
+                        <input type="date" id="entryDate">
                     </div>
                 </div>
-                <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">
-                    <i class="fas fa-sign-out-alt"></i> <span class="d-none d-sm-inline">خروج</span>
+
+                <div class="input-group">
+                    <label>اسم مدخل البيانات</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon-box"><i class="fa-solid fa-user-tie"></i></div>
+                        <input type="text" id="agentName" placeholder="الاسم واللقب">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>الرقم التسلسلي للعامل</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon-box"><i class="fa-solid fa-id-card"></i></div>
+                        <input type="text" id="agentId" placeholder="Matricule">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>القسم / الجهة</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon-box"><i class="fa-solid fa-sitemap"></i></div>
+                        <input type="text" id="department" placeholder="Département">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>اسم القطعة / المعدات</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon-box"><i class="fa-solid fa-gear"></i></div>
+                        <input type="text" id="partName" placeholder="Nom de la pièce">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>الرقم التسلسلي للقطعة (S/N)</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon-box"><i class="fa-solid fa-barcode"></i></div>
+                        <input type="text" id="partSerial" placeholder="Serial Number">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>المورد (Fournisseur)</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon-box"><i class="fa-solid fa-industry"></i></div>
+                        <input type="text" id="supplier" placeholder="اسم الشركة الموردة">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>رقم الحاوية</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon-box"><i class="fa-solid fa-box-open"></i></div>
+                        <input type="text" id="containerNum" placeholder="N° Conteneur">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>البلد المصدر (مثال: الصين، France)</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon-box"><i class="fa-solid fa-earth-americas"></i></div>
+                        <input type="text" id="country" placeholder="الدولة">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>الجهة المستقبلة</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon-box"><i class="fa-solid fa-warehouse"></i></div>
+                        <input type="text" id="receiver" placeholder="مخزن / ورشة">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>الحالة الأولية</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon-box"><i class="fa-solid fa-list-check"></i></div>
+                        <select id="initialStatus">
+                            <option value="داخل الميناء">داخل الميناء</option>
+                            <option value="مراقبة الجمارك">مراقبة الجمارك</option>
+                            <option value="مؤسسة النقل">مؤسسة النقل (توصيل)</option>
+                            <option value="الوجهة النهائية">الوجهة النهائية</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="saveBtn" class="btn-submit">
+                    <i class="fa-solid fa-floppy-disk"></i> حفظ وإضافة للقاعدة
                 </button>
             </div>
-        </nav>
-
-        <div class="container mt-4">
-            
-            <!-- Input Form Card -->
-            <div class="glass-card">
-                <div class="card-header-modern">
-                    <div>
-                        <h5 class="mb-1"><i class="fas fa-edit text-primary me-2"></i> بيانات الشحنة</h5>
-                        <small class="text-muted">Nouvelle Entrée</small>
-                    </div>
-                </div>
-                <div class="card-body p-4">
-                    <form id="tracking-form">
-                        
-                        <!-- Section 1 -->
-                        <div class="d-flex align-items-center mb-3">
-                            <span class="badge bg-primary rounded-pill me-2">1</span>
-                            <h6 class="text-primary fw-bold mb-0">معلومات المدخل / Agent</h6>
-                        </div>
-                        
-                        <div class="row g-2 mb-4">
-                            <!-- Mobile optimization: col-6 puts two inputs per row on phone -->
-                            <div class="col-6 col-md-3">
-                                <div class="form-floating">
-                                    <input type="date" id="date" class="form-control" required>
-                                    <label>التاريخ / Date</label>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="form-floating">
-                                    <input type="text" id="agentSerial" class="form-control" placeholder="123" required>
-                                    <label>الرقم / Matricule</label>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-3">
-                                <div class="form-floating">
-                                    <input type="text" id="agentName" class="form-control" placeholder="Name" required>
-                                    <label>الاسم واللقب / Nom</label>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-3">
-                                <div class="form-floating">
-                                    <input type="text" id="department" class="form-control" placeholder="Dept" required>
-                                    <label>الجهة / Département</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Section 2 -->
-                        <div class="d-flex align-items-center mb-3">
-                            <span class="badge bg-primary rounded-pill me-2">2</span>
-                            <h6 class="text-primary fw-bold mb-0">تفاصيل القطعة / Pièce</h6>
-                        </div>
-
-                        <div class="row g-2 mb-4">
-                            <div class="col-12 col-md-3">
-                                <div class="form-floating">
-                                    <input type="text" id="partName" class="form-control" placeholder="Part" required>
-                                    <label>اسم القطعة / Nom</label>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="form-floating">
-                                    <input type="text" id="partSerial" class="form-control" placeholder="Serial" required>
-                                    <label>رقم تسلسلي / N° Série</label>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="form-floating">
-                                    <input type="text" id="containerNum" class="form-control" placeholder="Container" required>
-                                    <label>الحاوية / Conteneur</label>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-3">
-                                <div class="form-floating">
-                                    <input type="text" id="supplier" class="form-control" placeholder="Supplier" required>
-                                    <label>المورد / Fournisseur</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Section 3 -->
-                        <div class="d-flex align-items-center mb-3">
-                            <span class="badge bg-primary rounded-pill me-2">3</span>
-                            <h6 class="text-primary fw-bold mb-0">المسار / Trajet</h6>
-                        </div>
-
-                        <div class="row g-2 mb-4">
-                            <div class="col-6 col-md-4">
-                                <div class="form-floating">
-                                    <input type="text" id="originCountry" class="form-control" placeholder="Origin" required>
-                                    <label>البلد / Pays</label>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-4">
-                                <div class="form-floating">
-                                    <input type="text" id="receiver" class="form-control" placeholder="Receiver" required>
-                                    <label>المستقبل / Destinataire</label>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-4">
-                                <div class="form-floating">
-                                    <select id="initialStatus" class="form-select" required>
-                                        <option value="" disabled selected>-- اختر الحالة --</option>
-                                        <option value="داخل الميناء">داخل الميناء / Au port</option>
-                                        <option value="المراقبة الجمركية">المراقبة الجمركية / Douane</option>
-                                        <option value="مؤسسة النقل">مؤسسة النقل / Transport</option>
-                                        <option value="الوجهة النهائية">الوجهة النهائية / Finale</option>
-                                    </select>
-                                    <label>الحالة / Statut</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-modern">
-                                <i class="fas fa-save me-2"></i> حفظ البيانات / Sauvegarder
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Data Table Card -->
-            <div class="glass-card">
-                <div class="card-header-modern">
-                    <div>
-                        <h5 class="mb-1"><i class="fas fa-list-alt text-primary me-2"></i> السجل</h5>
-                        <small class="text-muted">Journal de Suivi</small>
-                    </div>
-                    <span class="badge bg-light text-dark border">Live <i class="fas fa-circle text-success ms-1" style="font-size: 8px;"></i></span>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table modern-table table-hover mb-0 text-center" id="dataTable">
-                            <thead>
-                                <tr>
-                                    <th>التاريخ</th>
-                                    <th>القطعة</th>
-                                    <th>الرقم التسلسلي</th>
-                                    <th>المورد</th>
-                                    <th>الحاوية</th>
-                                    <th>البلد</th>
-                                    <th>المستقبل</th>
-                                    <th>المدخل</th>
-                                    <th width="200">الحالة الحالية</th>
-                                    <th>آخر تعديل</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody">
-                                <tr>
-                                    <td colspan="10" class="text-center py-5 text-muted">
-                                        <i class="fas fa-spinner fa-spin fa-2x mb-3"></i><br>جاري تحميل البيانات...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Mobile Scroll Hint -->
-                    <div class="d-block d-md-none text-center p-2 text-muted bg-light small">
-                        <i class="fas fa-arrows-alt-h me-1"></i> اسحب الجدول لرؤية المزيد
-                    </div>
-                </div>
-            </div>
-
         </div>
-    </section>
 
-    <!-- Script Section -->
+        <!-- جدول البيانات الشامل -->
+        <div class="table-card">
+            <div style="margin-bottom: 20px; display: flex; gap: 15px;">
+                <div class="input-wrapper" style="flex: 1; max-width: 400px;">
+                    <div class="input-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                    <input type="text" id="searchInput" placeholder="بحث شامل (اسم، رقم، بلد...)">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>القطعة / الرقم التسلسلي</th>
+                            <th>المورد / البلد</th>
+                            <th>الحاوية</th>
+                            <th>تاريخ الدخول</th>
+                            <th>بيانات المدخل</th>
+                            <th>الجهة المستقبلة</th>
+                            <th>الحالة الحالية</th>
+                            <th>آخر تحديث (24h)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- يتم التعبئة بالجافاسكريبت -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Code -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDezqmMGNy4lSWaEqcGzavsDzlNCcdNEws",
@@ -491,125 +364,231 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        let analytics;
-        try { analytics = getAnalytics(app); } catch(e) {}
+        const db = getDatabase(app);
 
-        const CORRECT_CODE = "100419982025";
-        const loginSection = document.getElementById('login-section');
-        const appSection = document.getElementById('app-section');
-        const loginBtn = document.getElementById('login-btn');
-        const accessInput = document.getElementById('access-code');
-        const errorMsg = document.getElementById('login-error');
-        const form = document.getElementById('tracking-form');
-        const tableBody = document.getElementById('tableBody');
+        // --- Helper: Strict 24h Formatted Time ---
+        const get24hTime = () => {
+            const d = new Date();
+            // بناء الوقت يدوياً لضمان الصيغة 24 ساعة
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            const hours = String(d.getHours()).padStart(2, '0'); // هذا يعطي 0-23
+            const minutes = String(d.getMinutes()).padStart(2, '0');
+            
+            return `${day}/${month}/${year} ${hours}:${minutes}`; // النتيجة: 28/12/2025 21:00
+        };
 
-        loginBtn.addEventListener('click', checkLogin);
-        accessInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') checkLogin();
-        });
+        // --- Helper Function: Get Country Flag Emoji ---
+        const getFlagEmoji = (countryName) => {
+            if(!countryName) return '🏳️';
+            const name = countryName.trim().toLowerCase();
+            
+            const flags = {
+                'algeria': '🇩🇿', 'الجزائر': '🇩🇿', 'dz': '🇩🇿',
+                'china': '🇨🇳', 'الصين': '🇨🇳', 'chine': '🇨🇳', 'cn': '🇨🇳',
+                'france': '🇫🇷', 'فرنسا': '🇫🇷', 'fr': '🇫🇷',
+                'germany': '🇩🇪', 'ألمانيا': '🇩🇪', 'allemagne': '🇩🇪', 'de': '🇩🇪',
+                'usa': '🇺🇸', 'أمريكا': '🇺🇸', 'etats-unis': '🇺🇸', 'us': '🇺🇸',
+                'italy': '🇮🇹', 'إيطاليا': '🇮🇹', 'italie': '🇮🇹',
+                'spain': '🇪🇸', 'إسبانيا': '🇪🇸', 'espagne': '🇪🇸',
+                'turkey': '🇹🇷', 'تركيا': '🇹🇷', 'turquie': '🇹🇷',
+                'japan': '🇯🇵', 'اليابان': '🇯🇵', 'japon': '🇯🇵',
+                'korea': '🇰🇷', 'كوريا': '🇰🇷', 'corée': '🇰🇷',
+                'russia': '🇷🇺', 'روسيا': '🇷🇺', 'russie': '🇷🇺',
+                'uk': '🇬🇧', 'بريطانيا': '🇬🇧', 'royaume-uni': '🇬🇧',
+                'uae': '🇦🇪', 'الإمارات': '🇦🇪', 'emirates': '🇦🇪'
+            };
 
-        function checkLogin() {
-            if (accessInput.value === CORRECT_CODE) {
-                loginSection.style.display = 'none';
-                appSection.style.display = 'block';
-                loadData();
-            } else {
-                errorMsg.style.display = 'block';
-                accessInput.value = '';
-                accessInput.focus();
+            for (const [key, flag] of Object.entries(flags)) {
+                if (name.includes(key)) return flag;
             }
-        }
+            return '🏳️';
+        };
 
-        window.logout = function() {
-            location.reload();
-        }
+        // --- Helper: Format Date ---
+        const formatDate = (dateString) => {
+            if (!dateString) return "-";
+            const date = new Date(dateString);
+            return new Intl.DateTimeFormat('fr-FR').format(date); // DD/MM/YYYY
+        };
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const newItem = {
-                date: document.getElementById('date').value,
+        // --- Main Logic: Save Data ---
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            const data = {
+                date: document.getElementById('entryDate').value,
                 agentName: document.getElementById('agentName').value,
-                agentSerial: document.getElementById('agentSerial').value,
+                agentId: document.getElementById('agentId').value,
                 department: document.getElementById('department').value,
                 partName: document.getElementById('partName').value,
                 partSerial: document.getElementById('partSerial').value,
                 supplier: document.getElementById('supplier').value,
                 containerNum: document.getElementById('containerNum').value,
-                originCountry: document.getElementById('originCountry').value,
+                country: document.getElementById('country').value,
                 receiver: document.getElementById('receiver').value,
-                currentStatus: document.getElementById('initialStatus').value,
-                lastModified: new Date().toLocaleString('ar-DZ')
+                status: document.getElementById('initialStatus').value,
+                lastModified: get24hTime() // استخدام الدالة الجديدة
             };
 
-            const dbRef = ref(database, 'shipments');
-            push(dbRef, newItem)
-                .then(() => {
-                    alert("تم حفظ البيانات بنجاح | Données enregistrées");
-                    form.reset();
-                })
-                .catch((error) => {
-                    alert("حدث خطأ: " + error.message);
+            if(!data.partName || !data.partSerial) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'تنبيه',
+                    text: 'يرجى إدخال اسم القطعة والرقم التسلسلي على الأقل'
                 });
+                return;
+            }
+
+            push(ref(db, 'shipments'), data).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم الحفظ',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                document.getElementById('partName').value = '';
+                document.getElementById('partSerial').value = '';
+                document.getElementById('containerNum').value = '';
+            });
         });
 
-        function loadData() {
-            const dbRef = ref(database, 'shipments');
-            onValue(dbRef, (snapshot) => {
-                tableBody.innerHTML = "";
-                const data = snapshot.val();
+        // --- Main Logic: Fetch & Display Data ---
+        onValue(ref(db, 'shipments'), (snapshot) => {
+            const tableBody = document.getElementById('tableBody');
+            const data = snapshot.val();
+            
+            let counts = { total: 0, port: 0, customs: 0, transport: 0, final: 0 };
 
-                if (!data) {
-                    tableBody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-muted">لا توجد بيانات / Aucune donnée</td></tr>';
-                    return;
-                }
+            tableBody.innerHTML = '';
 
-                const items = Object.entries(data).reverse();
+            if (data) {
+                const shipments = Object.entries(data).reverse();
+                counts.total = shipments.length;
 
-                items.forEach(([key, item]) => {
-                    const row = document.createElement('tr');
-                    
-                    let statusClass = '';
-                    if(item.currentStatus === 'داخل الميناء') statusClass = 'status-port';
-                    else if(item.currentStatus === 'المراقبة الجمركية') statusClass = 'status-customs';
-                    else if(item.currentStatus === 'مؤسسة النقل') statusClass = 'status-transport';
-                    else if(item.currentStatus === 'الوجهة النهائية') statusClass = 'status-final';
+                shipments.forEach(([id, item]) => {
+                    if (item.status === 'داخل الميناء') counts.port++;
+                    else if (item.status === 'مراقبة الجمارك') counts.customs++;
+                    else if (item.status === 'مؤسسة النقل') counts.transport++;
+                    else if (item.status === 'الوجهة النهائية') counts.final++;
 
-                    row.innerHTML = `
-                        <td class="fw-bold">${item.date}</td>
-                        <td class="text-primary fw-bold">${item.partName}</td>
-                        <td><span class="badge bg-light text-dark border">${item.partSerial}</span></td>
-                        <td>${item.supplier}</td>
-                        <td>${item.containerNum}</td>
-                        <td>${item.originCountry}</td>
-                        <td>${item.receiver}</td>
-                        <td class="small">
-                            <div class="fw-bold">${item.agentName}</div>
-                            <div class="text-muted" style="font-size:0.75rem">${item.department}</div>
-                        </td>
-                        <td>
-                            <select class="form-select form-select-sm status-select ${statusClass}" onchange="updateStatus('${key}', this)">
-                                <option value="داخل الميناء" ${item.currentStatus === 'داخل الميناء' ? 'selected' : ''}>داخل الميناء</option>
-                                <option value="المراقبة الجمركية" ${item.currentStatus === 'المراقبة الجمركية' ? 'selected' : ''}>المراقبة الجمركية</option>
-                                <option value="مؤسسة النقل" ${item.currentStatus === 'مؤسسة النقل' ? 'selected' : ''}>مؤسسة النقل</option>
-                                <option value="الوجهة النهائية" ${item.currentStatus === 'الوجهة النهائية' ? 'selected' : ''}>الوجهة النهائية</option>
-                            </select>
-                        </td>
-                        <td class="small text-muted" dir="ltr">${item.lastModified || '-'}</td>
+                    let badgeClass = 'st-port';
+                    let iconClass = 'fa-anchor';
+                    if(item.status === 'مراقبة الجمارك') { badgeClass = 'st-customs'; iconClass = 'fa-gavel'; }
+                    else if(item.status === 'مؤسسة النقل') { badgeClass = 'st-transport'; iconClass = 'fa-truck'; }
+                    else if(item.status === 'الوجهة النهائية') { badgeClass = 'st-final'; iconClass = 'fa-check'; }
+
+                    const flag = getFlagEmoji(item.country);
+                    const formattedDate = formatDate(item.date);
+
+                    const row = `
+                        <tr>
+                            <td>
+                                <div class="cell-main">${item.partName}</div>
+                                <div class="cell-sub">S/N: ${item.partSerial}</div>
+                            </td>
+                            <td>
+                                <div>${item.supplier}</div>
+                                <div class="cell-sub">${item.country || ''} <span class="flag-icon">${flag}</span></div>
+                            </td>
+                            <td>
+                                <strong>${item.containerNum || '-'}</strong>
+                            </td>
+                            <td style="direction: ltr; text-align: right;">${formattedDate}</td>
+                            <td>
+                                <div>${item.agentName}</div>
+                                <div class="cell-sub">ID: ${item.agentId} | ${item.department}</div>
+                            </td>
+                            <td>${item.receiver || '-'}</td>
+                            <td>
+                                <span class="status-badge ${badgeClass}" onclick="window.updateStatus('${id}', '${item.status}')">
+                                    <i class="fa-solid ${iconClass}"></i> ${item.status}
+                                </span>
+                            </td>
+                            <td class="cell-sub" style="direction: ltr; font-family: monospace; font-size: 0.95rem; font-weight: bold;">
+                                ${item.lastModified}
+                            </td>
+                        </tr>
                     `;
-                    tableBody.appendChild(row);
+                    tableBody.innerHTML += row;
                 });
+            } else {
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 20px;">لا توجد بيانات حالياً</td></tr>`;
+            }
+
+            document.getElementById('count-total').innerText = counts.total;
+            document.getElementById('count-port').innerText = counts.port;
+            document.getElementById('count-customs').innerText = counts.customs;
+            document.getElementById('count-transport').innerText = counts.transport;
+            document.getElementById('count-final').innerText = counts.final;
+        });
+
+        // دالة التحديث (Global)
+        window.updateStatus = async (id, currentStatus) => {
+            const { value: newStatus } = await Swal.fire({
+                title: 'تحديث حالة الشحنة',
+                input: 'select',
+                inputOptions: {
+                    'داخل الميناء': 'داخل الميناء',
+                    'مراقبة الجمارك': 'مراقبة الجمارك',
+                    'مؤسسة النقل': 'مؤسسة النقل (توصيل)',
+                    'الوجهة النهائية': 'الوجهة النهائية'
+                },
+                inputValue: currentStatus,
+                showCancelButton: true,
+                confirmButtonText: 'تحديث',
+                cancelButtonText: 'إلغاء'
             });
+
+            if (newStatus && newStatus !== currentStatus) {
+                update(ref(db, 'shipments/' + id), {
+                    status: newStatus,
+                    lastModified: get24hTime() // تحديث الوقت عند التعديل أيضاً
+                });
+            }
+        };
+
+        // تعيين التاريخ الحالي
+        document.getElementById('entryDate').valueAsDate = new Date();
+        document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString('ar-DZ', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    </script>
+
+    <script>
+        function checkLogin() {
+            const pin = document.getElementById('pinCode').value;
+            if(pin === '1077') {
+                document.getElementById('login-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('app-container').style.display = 'block';
+                }, 400);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ',
+                    text: 'الرمز السري غير صحيح!'
+                });
+                document.getElementById('pinCode').value = '';
+            }
         }
 
-        window.updateStatus = function(key, selectElement) {
-            const newStatus = selectElement.value;
-            const updates = {};
-            updates['/shipments/' + key + '/currentStatus'] = newStatus;
-            updates['/shipments/' + key + '/lastModified'] = new Date().toLocaleString('ar-DZ');
+        document.getElementById('pinCode').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') checkLogin();
+        });
 
-            update(ref(database), updates);
-        };
+        // البحث الشامل
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const filter = this.value.toUpperCase();
+            const rows = document.getElementById('dataTable').getElementsByTagName('tr');
+            
+            for (let i = 1; i < rows.length; i++) {
+                const rowContent = rows[i].textContent || rows[i].innerText;
+                if (rowContent.toUpperCase().indexOf(filter) > -1) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        });
     </script>
 </body>
 </html>
