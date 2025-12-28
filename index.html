@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -221,7 +220,8 @@
                     <label>تاريخ الإدخال</label>
                     <div class="input-wrapper">
                         <div class="input-icon-box"><i class="fa-regular fa-calendar"></i></div>
-                        <input type="date" id="entryDate">
+                        <!-- تم إضافة style="direction: ltr;" لجعل الأرقام لاتينية -->
+                        <input type="date" id="entryDate" style="direction: ltr;">
                     </div>
                 </div>
 
@@ -369,14 +369,12 @@
         // --- Helper: Strict 24h Formatted Time ---
         const get24hTime = () => {
             const d = new Date();
-            // بناء الوقت يدوياً لضمان الصيغة 24 ساعة
             const day = String(d.getDate()).padStart(2, '0');
             const month = String(d.getMonth() + 1).padStart(2, '0');
             const year = d.getFullYear();
-            const hours = String(d.getHours()).padStart(2, '0'); // هذا يعطي 0-23
+            const hours = String(d.getHours()).padStart(2, '0');
             const minutes = String(d.getMinutes()).padStart(2, '0');
-            
-            return `${day}/${month}/${year} ${hours}:${minutes}`; // النتيجة: 28/12/2025 21:00
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
         };
 
         // --- Helper Function: Get Country Flag Emoji ---
@@ -427,7 +425,7 @@
                 country: document.getElementById('country').value,
                 receiver: document.getElementById('receiver').value,
                 status: document.getElementById('initialStatus').value,
-                lastModified: get24hTime() // استخدام الدالة الجديدة
+                lastModified: get24hTime()
             };
 
             if(!data.partName || !data.partSerial) {
@@ -542,7 +540,7 @@
             if (newStatus && newStatus !== currentStatus) {
                 update(ref(db, 'shipments/' + id), {
                     status: newStatus,
-                    lastModified: get24hTime() // تحديث الوقت عند التعديل أيضاً
+                    lastModified: get24hTime()
                 });
             }
         };
